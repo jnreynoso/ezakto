@@ -1,0 +1,19 @@
+{
+  "name": "ezakto",
+  "version": "1.0.0",
+  "description": "Administrador de Notas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Ov3rFl0w/ezakto.git"
+  },
+  "author": "Jean Alessi Reynoso Mena",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ov3rFl0w/ezakto/issues"
+  },
+  "homepage": "https://github.com/Ov3rFl0w/ezakto#readme"
+}
