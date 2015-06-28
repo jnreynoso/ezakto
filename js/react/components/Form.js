@@ -22,30 +22,17 @@ var Form = React.createClass({
         });
     },
 
-    save: function() {
+    save: function(e) {
+        e.preventDefault();
+
         // Obtenemos los valores del formulario
         var note = {
             title: React.findDOMNode(this.refs.title).value,
             text: React.findDOMNode(this.refs.text).value
         };
 
-        // Leemos la lista de notas guardadas o creamos una vacía
-        var notes = window.localStorage.getItem('notes');
-
-        if (notes === null) {
-            notes = []; // Creamos una nueva lista vacía
-        } else {
-            notes = JSON.parse(notes); // Decodificamos la cadena
-        }
-
-        // Insertamos la nueva nota al principio de la lista
-        notes.unshift(note);
-
-        // Codificamos la lista como cadena de texto
-        notes = JSON.stringify(notes);
-
-        // Guardamos en localStorage
-        window.localStorage.setItem('notes', notes);
+        // Enviamos la nota al controller view
+        this.props.onSave(note);
 
         // Vaciamos el formulario
         React.findDOMNode(this.refs.title).value = '';
@@ -54,6 +41,7 @@ var Form = React.createClass({
         // Y finalmente lo cerramos
         this.close();
     },
+
 
     render: function() {
       return (
