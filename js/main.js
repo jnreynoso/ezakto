@@ -13,6 +13,26 @@ var React = require('react');
 
 var Form  = React.createClass({displayName: "Form",
 
+  getInitialState: function() {
+    return {
+      open: false
+    };
+  },
+
+  open: function() {
+    document.addEventListener('click', this.close);
+    this.setSate({
+      open: true
+    });
+  },
+
+  close: function() {
+    document.removeEventListener('click', this.close);
+    this.setState({
+      open: false
+    });
+  },
+
   render: function(){
     return (
         React.createElement("form", {className: "addNote"}, 
@@ -24,6 +44,12 @@ var Form  = React.createClass({displayName: "Form",
         )
         )
     );
+  },
+
+  componentDidMount: function() {
+    React.findDOMNode(this).addEventListener('click', function(e){
+      e.stopPropagation();
+    });
   }
 });
 
