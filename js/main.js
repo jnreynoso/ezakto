@@ -33,16 +33,49 @@ var Form = React.createClass({displayName: "Form",
         });
     },
 
+    save: function() {
+        // Obtenemos los valores del formulario
+        var note = {
+            title: React.findDOMNode(this.refs.title).value,
+            text: React.findDOMNode(this.refs.text).value
+        };
+
+        // Leemos la lista de notas guardadas o creamos una vacía
+        var notes = window.localStorage.getItem('notes');
+
+        if (notes === null) {
+            notes = []; // Creamos una nueva lista vacía
+        } else {
+            notes = JSON.parse(notes); // Decodificamos la cadena
+        }
+
+        // Insertamos la nueva nota al principio de la lista
+        notes.unshift(note);
+
+        // Codificamos la lista como cadena de texto
+        notes = JSON.stringify(notes);
+
+        // Guardamos en localStorage
+        window.localStorage.setItem('notes', notes);
+
+        // Vaciamos el formulario
+        React.findDOMNode(this.refs.title).value = '';
+        React.findDOMNode(this.refs.text).value = '';
+
+        // Y finalmente lo cerramos
+        this.close();
+    },
+
     render: function() {
-        return (
-            React.createElement("form", {className: "addnote" + (this.state.open ? ' open' : ''), onFocus: this.open}, 
-                React.createElement("input", {className: "addnote-title", type: "text", placeholder: "Título"}), 
-                React.createElement("textarea", {className: "addnote-text", placeholder: "Añadir nota"}), 
-                React.createElement("div", {className: "addnote-toolbar"}, 
-                    React.createElement("button", null, "Hecho"), 
-                    React.createElement("a", {className: "addnote-btn-list"})
-                )
+      return (
+          React.createElement("form", {className: "addnote" + (this.state.open ? ' open' : ''), onFocus: this.open, onSubmit: this.save}, 
+            React.createElement("input", {className: "addnote-title", type: "text", placeholder: "Título", ref: "title"}), 
+            React.createElement("textarea", {className: "addnote-text", placeholder: "Añadir nota", ref: "text"}), 
+            React.createElement("div", {className: "addnote-toolbar"}, 
+                React.createElement("button", null, "Hecho"), 
+                React.createElement("a", {className: "addnote-btn-list"})
             )
+        )
         );
     },
 
@@ -61,16 +94,37 @@ var React = require('react');
 var Note = require('./Note');
 
 var Grid = React.createClass({displayName: "Grid",
+
+  getInitialState: function() {
+    var notes = window.localStorage.getItem('notes');
+
+    if (notes === null) {
+      notes = [];
+    } else {
+      notes = JSON.parse(notes);
+    }
+
+    // Recordemos que es necesario devolver un objeto plano,
+    // por lo que asignamos nuestro array de notas como propiedad
+    return {
+      notes: notes
+    };
+  },
+
   render: function() {
+    var notes = this.state.notes.map(function(note, idx){
+      return (
+          React.createElement(Note, {title: note.title, text: note.text, key: idx})
+      );
+    });
+
     return (
         React.createElement("div", {className: "grid"}, 
-        React.createElement(Note, null), 
-        React.createElement(Note, null), 
-        React.createElement(Note, null)
-        )
-
+        notes
+      )
     );
   }
+
 });
 
 module.exports = Grid;
@@ -83,7 +137,10 @@ var Note  = React.createClass({displayName: "Note",
   render: function() {
     return (
         React.createElement("div", {className: "note"}, 
-        React.createElement("div", {className: "note-text"}, "Lorem Ipsum"), 
+        React.createElement("div", {className: "note-text"}, 
+        React.createElement("strong", null, this.props.title), 
+        React.createElement("p", null, this.props.text)
+        ), 
         React.createElement("div", {className: "note-toolbar"}, 
         React.createElement("a", {className: "note-btn-delete"})
         )
