@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/Ov3rFl0w/ezakto/issues"
   },
-  "homepage": "https://github.com/Ov3rFl0w/ezakto#readme"
+  "homepage": "https://github.com/Ov3rFl0w/ezakto#readme",
+  "devDependencies": {
+    "react": "^0.13.3",
+    "reactify": "^1.1.1"
+  }
 }
