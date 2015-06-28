@@ -135,19 +135,25 @@ var React = require('react');
 var Note  = React.createClass({displayName: "Note",
 
   render: function() {
+    var type = 'text-shortest';
+
+    if (this.props.text.length > 240) type = 'text-longest';
+    else if (this.props.text.length > 120) type = 'text-long';
+    else if (this.props.text.length > 60) type = 'text-medium';
+    else if (this.props.text.length > 30) type = 'text-short';
+
     return (
         React.createElement("div", {className: "note"}, 
         React.createElement("div", {className: "note-text"}, 
         React.createElement("strong", null, this.props.title), 
-        React.createElement("p", null, this.props.text)
+        React.createElement("p", {className: type}, this.props.text)
         ), 
         React.createElement("div", {className: "note-toolbar"}, 
         React.createElement("a", {className: "note-btn-delete"})
         )
         )
     );
-  }
-});
+  }});
 
 module.exports = Note;
 
