@@ -11,46 +11,47 @@ React.render(React.createElement(Grid, null), document.getElementById('grid'));
 },{"./components/Form.js":2,"./components/Grid.js":3,"react":159}],2:[function(require,module,exports){
 var React = require('react');
 
-var Form  = React.createClass({displayName: "Form",
+var Form = React.createClass({displayName: "Form",
 
-  getInitialState: function() {
-    return {
-      open: false
-    };
-  },
+    getInitialState: function() {
+        return {
+            open: false
+        };
+    },
 
-  open: function() {
-    document.addEventListener('click', this.close);
-    this.setSate({
-      open: true
-    });
-  },
+    open: function() {
+        document.addEventListener('click', this.close);
+        this.setState({
+            open: true
+        });
+    },
 
-  close: function() {
-    document.removeEventListener('click', this.close);
-    this.setState({
-      open: false
-    });
-  },
+    close: function() {
+        document.removeEventListener('click', this.close);
+        this.setState({
+            open: false
+        });
+    },
 
-  render: function(){
-    return (
-        React.createElement("form", {className: "addNote"}, 
-        React.createElement("input", {className: "addnote-title", type: "text", placeholder: "Titulo"}), 
-        React.createElement("textarea", {className: "addnote-text", placeholder: "Añadir nota"}), 
-        React.createElement("div", {className: "addnote-toolbar"}, 
-        React.createElement("button", null, "Hecho"), 
-        React.createElement("a", {className: "addnote-btn-list"})
-        )
-        )
-    );
-  },
+    render: function() {
+        return (
+            React.createElement("form", {className: "addnote" + (this.state.open ? ' open' : ''), onFocus: this.open}, 
+                React.createElement("input", {className: "addnote-title", type: "text", placeholder: "Título"}), 
+                React.createElement("textarea", {className: "addnote-text", placeholder: "Añadir nota"}), 
+                React.createElement("div", {className: "addnote-toolbar"}, 
+                    React.createElement("button", null, "Hecho"), 
+                    React.createElement("a", {className: "addnote-btn-list"})
+                )
+            )
+        );
+    },
 
-  componentDidMount: function() {
-    React.findDOMNode(this).addEventListener('click', function(e){
-      e.stopPropagation();
-    });
-  }
+    componentDidMount: function() {
+        React.findDOMNode(this).addEventListener('click', function(e){
+            e.stopPropagation();
+        });
+    }
+
 });
 
 module.exports = Form;
