@@ -20038,89 +20038,53 @@ module.exports = require('./lib/React');
 },{"./lib/React":31}],159:[function(require,module,exports){
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 
-// Esta función se encargará de cargar y decodificar la base de datos localStorage
-// cada vez que queramos modificar algo. El código es muy similar al que veníamos usando
-function loadDatabase() {
-    var notes = window.localStorage.getItem('notes');
-
-    if (notes === null) {
-        notes = [];
-    } else {
-        notes = JSON.parse(notes);
-    }
-
-    return notes;
-}
-
-// Esta otra función realizará el proceso inverso, codificar la base de datos
-// para almacenarla una vez que hayamos realizado las operaciones
-function saveDatabase(notes) {
-    window.localStorage.setItem('notes', JSON.stringify(notes));
-}
+// Creamos una referencia a un nodo "notes" en el almacenamiento firebase
+var NotesRef = new Firebase('https://intense-heat-8517.firebaseio.com/notes');
 
 var NoteActions = {
 
-    // Este método realizará la carga inicial de notas
     readNotes: function() {
-        var notes = loadDatabase();
+        // Escuchamos el evento "child_added", que se ejecutará cada vez
+        // que se agregue un elemento al nodo
+        NotesRef.on('child_added', function(snapshot) {
+            // Extraemos la información obtenida
+            var note = snapshot.val();
 
-        // Enviamos un objeto plano como mensaje a las stores
-        AppDispatcher.dispatch({
-            type: 'READ', // esta propiedad servirá para identificar el mensaje en la store y actuar acorde
-            notes: notes
+            // Usamos como id su key única en el almacenamiento
+            note.id = snapshot.key();
+
+            // Enviamos como mensaje al dispatcher la nota agregada
+            AppDispatcher.dispatch({
+                type: 'CREATE',
+                note: note
+            });
+        });
+
+        // Esuchamos el evento "child_removed", que es el inverso al anterior,
+        // pues se ejecutará cada vez que un elemento sea eliminado del nodo
+        NotesRef.on('child_removed', function(snapshot) {
+            // Obtenemos la key única del elemento que se eliminó, que usamos como id
+            var id = snapshot.key();
+
+            // Enviamos al Dispatcher la id de la nota eliminada
+            AppDispatcher.dispatch({
+                type: 'DELETE',
+                id: id
+            });
         });
     },
 
-    // Usaremos el nombre 'create' en vez 'save' para concordar con "CRUD"
     createNote: function(title, text) {
-        // Creamos una id única rápida
-        var id = new Date().getTime();
-
-        // Construimos el objeto a almacenar
-        var note = {
-            id: id,
+        // Insertamos la nota en el nodo
+        NotesRef.push({
             title: title,
             text: text
-        };
-
-        // Abrimos la base de datos
-        var notes = loadDatabase();
-
-        // Insertamos la nota nueva
-        notes.unshift(note);
-
-        // Guardamos
-        saveDatabase(notes);
-
-        // Enviamos como mensaje la nota que hemos creado
-        AppDispatcher.dispatch({
-            type: 'CREATE',
-            note: note
         });
     },
 
-    // Finalmente para eliminar una nota por su id
     deleteNote: function(id) {
-        // Abrimos db
-        var notes = loadDatabase();
-
-        // Recorremos el array en busca de la nota
-        for (var i = 0, l = notes.length; i < l; i++) {
-            // Si la encontramos, la eliminamos, sincronizamos y salimos del ciclo
-            if (notes[i].id === id) {
-                notes.splice(i, 1);
-
-                saveDatabase(notes);
-
-                break;
-            }
-        }
-
-        // Enviamos al Dispatcher la id de la nota eliminada
-        AppDispatcher.dispatch({
-            type: 'DELETE',
-            id: id
-        });
+        // Accedemos al elemento y lo eliminamos
+        NotesRef.child(id).set(null);
     }
 
 };
@@ -20152,23 +20116,24 @@ function callback(payload) {
   // Basándonos en la propiedad type del mensaje, podemos inferir qué datos
   // contiene el mensaje y qué debemos hacer con ellos
   switch (payload.type) {
-  case 'READ':
-    _notes.push.apply(_notes, payload.notes);
-    break;
-  case 'CREATE':
-    _notes.unshift(payload.note);
-    break;
-  case 'DELETE':
-    for (var i = 0, l = _notes.length; i < l; i++) {
-      if (_notes[i].id === payload.id) {
-        _notes.splice(i, 1);
+
+    case 'READ':
+        _notes.push.apply(_notes, payload.notes);
         break;
-      }
-    }
-    break;
+    case 'CREATE':
+        _notes.unshift(payload.note);
+        break;
+    case 'DELETE':
+        for (var i = 0, l = _notes.length; i < l; i++) {
+          if (_notes[i].id === payload.id) {
+              _notes.splice(i, 1);
+              break;
+          }
+        }
+        break;
 
     // Si se ignora el mensaje, directamente termina
-  default: return true;
+    default: return true;
   }
 
   // Si no se ignora el mensaje, emitimos el evento
@@ -20270,8 +20235,8 @@ var Form = React.createClass({displayName: "Form",
 
         // Obtenemos los valores del formulario
         var note = {
-        title: React.findDOMNode(this.refs.title).value,
-        text: React.findDOMNode(this.refs.text).value
+            title: React.findDOMNode(this.refs.title).value,
+            text: React.findDOMNode(this.refs.text).value
         };
 
         // Solicitamos la creación de la nota
@@ -20354,7 +20319,7 @@ var Grid = React.createClass({displayName: "Grid",
   render: function() {
     var notes = this.props.notes.map(function(note, idx){
       return (
-          React.createElement(Note, {id: note.id, title: note.title, text: note.text, key: note.id})
+          React.createElement(Note, {id: note.id, title: note.title, text: note.text, key: note.id, ref: 'note-'+note.id})
       );
     });
 

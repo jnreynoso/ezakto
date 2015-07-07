@@ -43,7 +43,7 @@ var Grid = React.createClass({
   render: function() {
     var notes = this.props.notes.map(function(note, idx){
       return (
-          <Note id={note.id} title={note.title} text={note.text} key={note.id} />
+          <Note id={note.id} title={note.title} text={note.text} key={note.id} ref={'note-'+note.id} />
       );
     });
 
