@@ -1,6 +1,11 @@
 var React = require('react');
+var NoteActions = require('../actions/NoteActions');
 
 var Note  = React.createClass({
+
+  remove: function() {
+    NoteActions.deleteNote(this.props.id);
+  },
 
   setPosition: function(top, column) {
     var element = React.findDOMNode(this);
@@ -16,6 +21,7 @@ var Note  = React.createClass({
   },
 
   render: function() {
+
     var type = 'text-shortest';
 
     if (this.props.text.length > 240) type = 'text-longest';
@@ -27,13 +33,15 @@ var Note  = React.createClass({
         <div className="note">
         <div className="note-text">
         <strong>{this.props.title}</strong>
-        <p className={type}>{this.props.text}</p>
+        <p>{this.props.text}</p>
         </div>
         <div className="note-toolbar">
-        <a className="note-btn-delete" />
+        <a className="note-btn-delete" onClick={this.remove} />
         </div>
         </div>
     );
-  }});
+  }
+
+});
 
 module.exports = Note;

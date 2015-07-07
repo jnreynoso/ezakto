@@ -1,4 +1,5 @@
 var React = require('react');
+var NoteActions = require('../actions/NoteActions');
 
 var Form = React.createClass({
 
@@ -31,8 +32,8 @@ var Form = React.createClass({
             text: React.findDOMNode(this.refs.text).value
         };
 
-        // Enviamos la nota al controller view
-        this.props.onSave(note);
+        // Solicitamos la creación de la nota
+        NoteActions.createNote(note.title, note.text);
 
         // Vaciamos el formulario
         React.findDOMNode(this.refs.title).value = '';
@@ -41,7 +42,6 @@ var Form = React.createClass({
         // Y finalmente lo cerramos
         this.close();
     },
-
 
     render: function() {
       return (

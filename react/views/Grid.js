@@ -32,7 +32,6 @@ var Grid = React.createClass({
         grid_heights[min_col] += note.getHeight();
     }
   },
-
   componentDidMount: function() {
     this.calculatePositions();
   },
@@ -44,7 +43,7 @@ var Grid = React.createClass({
   render: function() {
     var notes = this.props.notes.map(function(note, idx){
       return (
-          <Note id={note.id} title={note.title} text={note.text} key={note.id} ref={'note-'+note.id} />
+          <Note id={note.id} title={note.title} text={note.text} key={note.id} />
       );
     });
 
